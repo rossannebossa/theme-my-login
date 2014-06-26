@@ -3,7 +3,7 @@ Contributors: jfarthing84
 Tags: widget, login, registration, theme, custom, log in, register, sidebar, gravatar, redirection, e-mail
 Requires at least: 3.1
 Tested up to: 3.9.1
-Stable tag: 6.3.11
+Stable tag: 6.3.10
 
 Themes the WordPress login pages according to your theme.
 
@@ -55,9 +55,6 @@ Please visit http://www.jfarthing.com/development/theme-my-login first and then 
 
 
 == Changelog ==
-
-= 6.3.11 =
-* Fix potential local file include vulnerability in templating system - for real this time
 
 = 6.3.10 =
 * Fix potential local file include vulnerability in templating system
