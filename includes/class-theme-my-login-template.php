@@ -194,7 +194,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$wp_error =& $theme_my_login->errors;
+		$wp_error = $theme_my_login->errors;
 
 		if ( empty( $wp_error ) )
 			$wp_error = new WP_Error();
@@ -293,7 +293,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 			'register'     => true,
 			'lostpassword' => true
 		) );
-		
+
 		$action_links = array();
 		if ( $args['login'] && $this->get_option( 'show_log_link' ) ) {
 			$action_links[] = array(
@@ -444,7 +444,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 		$theme_my_login = Theme_My_Login::get_object();
 
 		// User friendly access to this
-		$template =& $this;
+		$template = $this;
 
 		// Easy access to current user
 		$current_user = wp_get_current_user();

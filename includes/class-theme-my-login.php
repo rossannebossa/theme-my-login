@@ -929,7 +929,7 @@ if(typeof wpOnload=='function')wpOnload()
 	 * @param object $object Instance object
 	 */
 	public function set_instance( $object ) {
-		$this->loaded_instances[] =& $object;
+		$this->loaded_instances[] = $object;
 	}
 
 	/**

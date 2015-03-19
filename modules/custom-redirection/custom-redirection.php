@@ -89,7 +89,7 @@ class Theme_My_Login_Custom_Redirection extends Theme_My_Login_Abstract {
 	 * @access public
 	 */
 	public function login_form() {
-		$template =& Theme_My_Login::get_object()->get_active_instance();
+		$template = Theme_My_Login::get_object()->get_active_instance();
 		echo wp_original_referer_field( false, $template->get_option( 'instance' ) ? 'current' : 'previous' ) . "\n";
 	}
 

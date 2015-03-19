@@ -63,7 +63,7 @@ class Theme_My_Login_Custom_Passwords extends Theme_My_Login_Abstract {
 	 * @access public
 	 */
 	public function password_fields() {
-		$template =& Theme_My_Login::get_object()->get_active_instance();
+		$template = Theme_My_Login::get_object()->get_active_instance();
 		?>
 		<p><label for="pass1<?php $template->the_instance(); ?>"><?php _e( 'Password' ); ?></label>
 		<input autocomplete="off" name="pass1" id="pass1<?php $template->the_instance(); ?>" class="input" size="20" value="" type="password" /></p>
@@ -84,7 +84,7 @@ class Theme_My_Login_Custom_Passwords extends Theme_My_Login_Abstract {
 	public function ms_password_fields() {
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$template =& $theme_my_login->get_active_instance();
+		$template = $theme_my_login->get_active_instance();
 
 		$errors = array();
 		foreach ( $theme_my_login->errors->get_error_codes() as $code ) {

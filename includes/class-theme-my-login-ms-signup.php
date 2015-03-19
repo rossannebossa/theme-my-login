@@ -285,7 +285,7 @@ class Theme_My_Login_MS_Signup extends Theme_My_Login_Abstract {
 
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$template =& $theme_my_login->get_active_instance();
+		$template = $theme_my_login->get_active_instance();
 
 		// allow definition of default variables
 		$filtered_results = apply_filters( 'signup_user_init', array( 'user_name' => $user_name, 'user_email' => $user_email, 'errors' => $theme_my_login->errors ) );
@@ -315,7 +315,7 @@ class Theme_My_Login_MS_Signup extends Theme_My_Login_Abstract {
 
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$template =& $theme_my_login->get_active_instance();
+		$template = $theme_my_login->get_active_instance();
 
 		// allow definition of default variables
 		$filtered_results = apply_filters( 'signup_blog_init', array( 'user_name' => $user_name, 'user_email' => $user_email, 'blogname' => $blogname, 'blog_title' => $blog_title, 'errors' => $theme_my_login->errors ) );
@@ -348,7 +348,7 @@ class Theme_My_Login_MS_Signup extends Theme_My_Login_Abstract {
 
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$template =& $theme_my_login->get_active_instance();
+		$template = $theme_my_login->get_active_instance();
 
 		// allow definition of default variables
 		$filtered_results = apply_filters( 'signup_another_blog_init', array( 'blogname' => $blogname, 'blog_title' => $blog_title, 'errors' => $theme_my_login->errors ) );
