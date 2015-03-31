@@ -104,7 +104,7 @@ Theme My Login will always look in your theme's directory first, before using th
 		</tr>
 
 		<?php
-			foreach ( wp_get_user_contactmethods() as $name => $desc ) {
+			foreach ( wp_get_user_contact_methods() as $name => $desc ) {
 		?>
 		<tr>
 			<th><label for="<?php echo $name; ?>"><?php echo apply_filters( 'user_'.$name.'_label', $desc ); ?></label></th>
