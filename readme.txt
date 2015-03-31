@@ -1,9 +1,9 @@
 === Theme My Login ===
 Contributors: jfarthing84
 Tags: widget, login, registration, theme, custom, log in, register, sidebar, gravatar, redirection, e-mail
-Requires at least: 3.1
-Tested up to: 3.9.1
-Stable tag: 6.3.10
+Requires at least: 3.7
+Tested up to: 4.2
+Stable tag: 6.3.11
 
 Themes the WordPress login pages according to your theme.
 
@@ -51,17 +51,22 @@ As of version 6.3, Theme My Login no longer ships with translation files. Transl
 
 = How do I obtain additional assistance? =
 
-Please visit http://www.jfarthing.com/development/theme-my-login first and then visit http://www.jfarthing.com/support if you have any questions, concerns, suggestions or problems.
+Please visit http://www.jfarthing.com/development/theme-my-login.
 
 
 == Changelog ==
 
+= 6.3.11 =
+* Fix interim login
+* Fix partial translations
+* Fix toolbar disappearing when updating a themed profile
+
 = 6.3.10 =
-* Fix potential local file include vulnerability in templating system
+* Fix local file include vulnerability in templating system
 
 = 6.3.9 =
 * Fix strict standards errors
-* Replace deprecated functions
+* Fix deprecated function notices
 
 = 6.3.8 =
 * Fix issue where pages would redirect to profile page with Themed Profiles active
@@ -81,7 +86,7 @@ Please visit http://www.jfarthing.com/development/theme-my-login first and then 
 * Fix issue where error messages were duplicated on login pages
 
 = 6.3.5 =
-* Fix issue with blank pages where page.php didn't exists in a theme
+* Fix issue with blank pages where page.php didn't exist in a theme
 * Fix issue where activating Themed Profiles resulted in a 404 for profile page
 * Fix issue where options were being deleted upon upgrade
 * Fix issue with AJAX module not working properly in Internet Explorer
@@ -378,7 +383,7 @@ Please visit http://www.jfarthing.com/development/theme-my-login first and then 
 * Fixed the load_plugin_textdomain() call
 * Added 'login_head' action hook
 
-= 3.2.3 = 
+= 3.2.3 =
 * Fixed and updated many gettext calls for internationalization
 
 = 3.2.2 =
@@ -464,9 +469,3 @@ Please visit http://www.jfarthing.com/development/theme-my-login first and then 
 
 = 1.0.0 =
 * Initial release version
-
-
-== Upgrade Notice ==
-
-= 6.4 =
-WARNING: This version will render all of your custom templates obsolete!
