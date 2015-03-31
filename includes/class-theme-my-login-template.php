@@ -154,17 +154,17 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 			} else {
 				switch ( $action ) {
 					case 'register':
-						$title = __( 'Register' );
+						$title = __( 'Register', 'theme-my-login' );
 						break;
 					case 'lostpassword':
 					case 'retrievepassword':
 					case 'resetpass':
 					case 'rp':
-						$title = __( 'Lost Password' );
+						$title = __( 'Lost Password', 'theme-my-login' );
 						break;
 					case 'login':
 					default:
-						$title = __( 'Log In' );
+						$title = __( 'Log In', 'theme-my-login' );
 				}
 			}
 		}
@@ -345,10 +345,10 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	public static function get_user_links() {
 		$user_links = array(
 			array(
-				'title' => __( 'Dashboard' ),
+				'title' => __( 'Dashboard', 'theme-my-login' ),
 				'url'   => admin_url() ),
 			array(
-				'title' => __( 'Profile' ),
+				'title' => __( 'Profile', 'theme-my-login' ),
 				'url'   => admin_url( 'profile.php' )
 			)
 		);
@@ -397,13 +397,13 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	public static function get_action_template_message( $action = '' ) {
 		switch ( $action ) {
 			case 'register':
-				$message = __( 'Register For This Site' );
+				$message = __( 'Register For This Site', 'theme-my-login' );
 				break;
 			case 'lostpassword':
-				$message = __( 'Please enter your username or email address. You will receive a link to create a new password via email.' );
+				$message = __( 'Please enter your username or email address. You will receive a link to create a new password via email.', 'theme-my-login' );
 				break;
 			case 'resetpass':
-				$message = __( 'Enter your new password below.' );
+				$message = __( 'Enter your new password below.', 'theme-my-login' );
 				break;
 			default:
 				$message = '';
