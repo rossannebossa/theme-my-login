@@ -14,15 +14,19 @@ Theme My Login will always look in your theme's directory first, before using th
 			<input type="hidden" name="checkuser_id" value="<?php echo $current_user->ID; ?>" />
 		</p>
 
-		<?php if ( has_action( 'personal_options' ) ) : ?>
 
 		<h3><?php _e( 'Personal Options', 'theme-my-login' ); ?></h3>
 
 		<table class="form-table">
+		<tr class="show-admin-bar user-admin-bar-front-wrap">
+			<th><label for="admin_bar_front"><?php _e( 'Toolbar', 'theme-my-login' )?></label></th>
+			<td>
+				<label for="admin_bar_front"><input type="checkbox" name="admin_bar_front" id="admin_bar_front" value="1"<?php checked( _get_admin_bar_pref( 'front', $profileuser->ID ) ); ?> />
+				<?php _e( 'Show Toolbar when viewing site', 'theme-my-login' ); ?></label>
+			</td>
+		</tr>
 		<?php do_action( 'personal_options', $profileuser ); ?>
 		</table>
-
-		<?php endif; ?>
 
 		<?php do_action( 'profile_personal_options', $profileuser ); ?>
 
@@ -100,7 +104,7 @@ Theme My Login will always look in your theme's directory first, before using th
 		</tr>
 
 		<?php
-			foreach ( _wp_get_user_contactmethods() as $name => $desc ) {
+			foreach ( wp_get_user_contactmethods() as $name => $desc ) {
 		?>
 		<tr>
 			<th><label for="<?php echo $name; ?>"><?php echo apply_filters( 'user_'.$name.'_label', $desc ); ?></label></th>
