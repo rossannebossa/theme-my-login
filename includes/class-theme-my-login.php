@@ -573,16 +573,38 @@ if(typeof wpOnload=='function')wpOnload()
 	public function site_url( $url, $path, $orig_scheme ) {
 		global $pagenow;
 
-		if ( 'wp-login.php' != $pagenow && false !== strpos( $url, 'wp-login.php' ) && ! isset( $_REQUEST['interim-login'] ) ) {
-			parse_str( parse_url( $url, PHP_URL_QUERY ), $query );
+		// Bail if currently viewing wp-login.php
+		if ( 'wp-login.php' == $pagenow )
+			return $url;
 
-			$action = isset( $query['action'] ) ? $query['action'] : 'login';
+		// Bail if the URL isn't a login URL
+		if ( false === strpos( $url, 'wp-login.php' ) )
+			return $url;
 
-			$url = self::get_page_link( $action, $query );
+		// Parse the query string from the URL
+		parse_str( parse_url( $url, PHP_URL_QUERY ), $query );
 
-			if ( 'https' == strtolower( $orig_scheme ) )
-				$url = preg_replace( '|^http://|', 'https://', $url );
-		}
+		/**
+		 * Bail if the URL is an interim-login URL
+		 *
+		 * This only works using the javascript workaround as implemented in
+		 * admin/theme-my-login-admin.php and admin/js/theme-my-login-admin.js.
+		 *
+		 * @see http://core.trac.wordpress.org/ticket/31821
+		 */
+		if ( isset( $query['interim-login'] ) )
+			return $url;
+
+		// Determine the action
+		$action = isset( $query['action'] ) ? $query['action'] : 'login';
+
+		// Get the action's page link
+		$url = self::get_page_link( $action, $query );
+
+		// Change the connection scheme to HTTPS, if needed
+		if ( 'https' == strtolower( $orig_scheme ) )
+			$url = preg_replace( '|^http://|', 'https://', $url );
+
 		return $url;
 	}
 
