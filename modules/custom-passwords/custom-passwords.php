@@ -16,29 +16,41 @@ if ( ! class_exists( 'Theme_My_Login_Custom_Passwords' ) ) :
  *
  * @since 6.0
  */
-class Theme_My_Login_Custom_Passwords {
+class Theme_My_Login_Custom_Passwords extends Theme_My_Login_Abstract {
 	/**
-	 * Constructor
+	 * Returns singleton instance
 	 *
-	 * @since 6.4
+	 * @since 6.3
+	 * @access public
+	 * @return object
 	 */
-	public function __construct() {
-		add_action( 'register_form',       array( $this, 'password_fields' ) );
-		add_filter( 'registration_errors', array( $this, 'password_errors' ) );
-		add_filter( 'random_password',     array( $this, 'set_password'    ) );
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
 
-		add_action( 'signup_extra_fields',       array( $this, 'ms_password_fields'       ) );
-		add_action( 'signup_hidden_fields',      array( $this, 'ms_hidden_password_field' ) );
-		add_filter( 'wpmu_validate_user_signup', array( $this, 'ms_password_errors'       ) );
-		add_filter( 'add_signup_meta',           array( $this, 'ms_save_password'         ) );
+	/**
+	 * Loads the module
+	 *
+	 * @since 6.0
+	 * @access protected
+	 */
+	protected function load() {
+		add_action( 'register_form',       array( &$this, 'password_fields' ) );
+		add_filter( 'registration_errors', array( &$this, 'password_errors' ) );
+		add_filter( 'random_password',     array( &$this, 'set_password'    ) );
 
-		add_action( 'tml_new_user_registered', array( $this, 'remove_default_password_nag' ) );
-		add_action( 'approve_user',            array( $this, 'remove_default_password_nag' ) );
+		add_action( 'signup_extra_fields',       array( &$this, 'ms_password_fields'       ) );
+		add_action( 'signup_hidden_fields',      array( &$this, 'ms_hidden_password_field' ) );
+		add_filter( 'wpmu_validate_user_signup', array( &$this, 'ms_password_errors'       ) );
+		add_filter( 'add_signup_meta',           array( &$this, 'ms_save_password'         ) );
 
-		add_filter( 'tml_register_passmail_template_message', array( $this, 'register_passmail_template_message' ) );
-		add_action( 'tml_request',                            array( $this, 'action_messages'                    ) );
+		add_action( 'tml_new_user_registered', array( &$this, 'remove_default_password_nag' ) );
+		add_action( 'approve_user',            array( &$this, 'remove_default_password_nag' ) );
 
-		add_filter( 'registration_redirect', array( $this, 'registration_redirect' ) );
+		add_filter( 'tml_register_passmail_template_message', array( &$this, 'register_passmail_template_message' ) );
+		add_action( 'tml_request',                            array( &$this, 'action_messages'                    ) );
+
+		add_filter( 'registration_redirect', array( &$this, 'registration_redirect' ) );
 	}
 
 	/**
@@ -48,11 +60,12 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::display()
 	 * @since 6.0
+	 * @access public
 	 */
 	public function password_fields() {
-		$template =& Theme_My_Login::get_object()->get_active_instance();
+		$template = Theme_My_Login::get_object()->get_active_instance();
 		?>
-		<p><label for="pass1<?php $template->the_instance(); ?>"><?php _e( 'Password' ); ?></label>
+		<p><label for="pass1<?php $template->the_instance(); ?>"><?php _e( 'Password', 'theme-my-login' ); ?></label>
 		<input autocomplete="off" name="pass1" id="pass1<?php $template->the_instance(); ?>" class="input" size="20" value="" type="password" /></p>
 		<p><label for="pass2<?php $template->the_instance(); ?>"><?php _e( 'Confirm Password', 'theme-my-login' ); ?></label>
 		<input autocomplete="off" name="pass2" id="pass2<?php $template->the_instance(); ?>" class="input" size="20" value="" type="password" /></p>
@@ -66,11 +79,12 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::display()
 	 * @since 6.1
+	 * @access public
 	 */
 	public function ms_password_fields() {
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$template =& $theme_my_login->get_active_instance();
+		$template = $theme_my_login->get_active_instance();
 
 		$errors = array();
 		foreach ( $theme_my_login->errors->get_error_codes() as $code ) {
@@ -98,6 +112,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::display()
 	 * @since 6.1
+	 * @access public
 	 */
 	public function ms_hidden_password_field() {
 		if ( isset( $_POST['user_pass'] ) )
@@ -111,6 +126,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::register_new_user()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param WP_Error $errors WP_Error object
 	 * @return WP_Error WP_Error object
@@ -122,15 +138,15 @@ class Theme_My_Login_Custom_Passwords {
 
 		// Make sure passwords aren't empty
 		if ( empty( $_POST['pass1'] ) || empty( $_POST['pass2'] ) ) {
-			$errors->add( 'empty_password', __( '<strong>ERROR</strong>: Please enter your password twice.' ) );
+			$errors->add( 'empty_password', __( '<strong>ERROR</strong>: Please enter your password twice.', 'theme-my-login' ) );
 
 		// Make sure there's no "\" in the password
 		} elseif ( false !== strpos( stripslashes( $_POST['pass1'] ), "\\" ) ) {
-			$errors->add( 'password_backslash', __( '<strong>ERROR</strong>: Passwords may not contain the character "\\".' ) );
+			$errors->add( 'password_backslash', __( '<strong>ERROR</strong>: Passwords may not contain the character "\\".', 'theme-my-login' ) );
 
 		// Make sure passwords match
 		} elseif ( $_POST['pass1'] != $_POST['pass2'] ) {
-			$errors->add( 'password_mismatch', __( '<strong>ERROR</strong>: Please enter the same password in the two password fields.' ) );
+			$errors->add( 'password_mismatch', __( '<strong>ERROR</strong>: Please enter the same password in the two password fields.', 'theme-my-login' ) );
 
 		// Make sure password is long enough
 		} elseif ( strlen( $_POST['pass1'] ) < 6 ) {
@@ -151,6 +167,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::register_new_user()
 	 * @since 6.1
+	 * @access public
 	 *
 	 * @param WP_Error $errors WP_Error object
 	 * @return WP_Error WP_Error object
@@ -173,6 +190,7 @@ class Theme_My_Login_Custom_Passwords {
 	 * Callback for "add_signup_meta" hook
 	 *
 	 * @since 6.1
+	 * @access public
 	 *
 	 * @param array $meta Signup meta
 	 * @return array $meta Signup meta
@@ -190,6 +208,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see wp_generate_password()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $password Auto-generated password passed in from filter
 	 * @return string Password chosen by user
@@ -224,6 +243,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login::register_new_user()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param int $user_id The user's ID
 	 */
@@ -237,6 +257,7 @@ class Theme_My_Login_Custom_Passwords {
 	 * Callback for "tml_register_passmail_template_message" hook
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @return string The new register message
 	 */
@@ -251,6 +272,7 @@ class Theme_My_Login_Custom_Passwords {
 	 * Callback for "tml_request" hook in Theme_My_Login::the_request()
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param object $theme_my_login Reference to global $theme_my_login object
 	 */
@@ -267,6 +289,7 @@ class Theme_My_Login_Custom_Passwords {
 	 *
 	 * @see Theme_My_Login_Template::get_redirect_url()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @return string $redirect_to Default redirect
 	 * @return string URL to redirect to
@@ -281,9 +304,7 @@ class Theme_My_Login_Custom_Passwords {
 	}
 }
 
-/**
- * Load the Custom Passwords module
- */
-Theme_My_Login::get_object()->load_module( 'custom-passwords', 'Theme_My_Login_Custom_Passwords' );
+Theme_My_Login_Custom_Passwords::get_object();
 
-endif; // Class exists
+endif;
+

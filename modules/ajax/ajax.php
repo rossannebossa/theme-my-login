@@ -3,6 +3,8 @@
  * Plugin Name: AJAX
  * Description: Enabling this module will initialize and enable AJAX. There are no other settings for this module.
  *
+ * Class: Theme_My_Login_Ajax
+ *
  * Holds the Theme My Login Ajax class
  *
  * @package Theme_My_Login
@@ -16,26 +18,39 @@ if ( ! class_exists( 'Theme_My_Login_Ajax' ) ) :
  *
  * @since 6.3
  */
-class Theme_My_Login_Ajax {
+class Theme_My_Login_Ajax extends Theme_My_Login_Abstract {
 	/**
-	 * Constructor
+	 * Returns singleton instance
 	 *
 	 * @since 6.3
+	 * @access public
+	 * @return object
 	 */
-	public function __construct() {
-		add_action( 'template_redirect',  array( $this, 'template_redirect'  ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
 
-		add_filter( 'tml_action_url',         array( $this, 'tml_action_url'         ),  100, 3 );
-		add_filter( 'tml_redirect_url',       array( $this, 'tml_redirect_url'       ),  100, 2 );
-		add_filter( 'page_css_class',         array( $this, 'page_css_class'         ),   10, 2 );
-		add_filter( 'wp_setup_nav_menu_item', array( $this, 'wp_setup_nav_menu_item' )          );
+	/**
+	 * Loads the module
+	 *
+	 * @since 6.3
+	 * @access protected
+	 */
+	protected function load() {
+		add_action( 'template_redirect',  array( &$this, 'template_redirect'  ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'wp_enqueue_scripts' ) );
+
+		add_filter( 'tml_action_url',         array( &$this, 'tml_action_url'         ),  100, 3 );
+		add_filter( 'tml_redirect_url',       array( &$this, 'tml_redirect_url'       ),  100, 2 );
+		add_filter( 'page_css_class',         array( &$this, 'page_css_class'         ),   10, 2 );
+		add_filter( 'wp_setup_nav_menu_item', array( &$this, 'wp_setup_nav_menu_item' )          );
 	}
 
 	/**
 	 * Returns default AJAX actions
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @return array AJAX actions
 	 */
@@ -50,6 +65,7 @@ class Theme_My_Login_Ajax {
 	 * Handles AJAX response
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function template_redirect() {
 
@@ -57,6 +73,15 @@ class Theme_My_Login_Ajax {
 
 		if ( Theme_My_Login::is_tml_page() && isset( $_GET['ajax'] ) ) {
 			define( 'DOING_AJAX', true );
+
+			$instance = $theme_my_login->get_instance();
+
+			$instance->set_option( 'default_action', ! empty( $theme_my_login->request_action ) ? $theme_my_login->request_action : 'login' );
+			$instance->set_option( 'gravatar_size', 75    );
+			$instance->set_option( 'before_title', '<h2>' );
+			$instance->set_option( 'after_title', '</h2>' );
+
+			$data = $instance->display();
 
 			send_origin_headers();
 
@@ -66,17 +91,17 @@ class Theme_My_Login_Ajax {
 			send_nosniff_header();
 			nocache_headers();
 
-			$instance =& $theme_my_login->get_instance();
-
-			$instance->set_option( 'default_action', $theme_my_login->request_action );
-			$instance->set_option( 'gravatar_size', 75 );
-			$instance->set_option( 'before_title', '<h2>' );
-			$instance->set_option( 'after_title', '</h2>' );
-
-			if ( is_user_logged_in() )
-				wp_send_json_success( $instance->display() );
-
-			wp_send_json_error( $instance->display() );
+			$x = new WP_Ajax_Response( array(
+				'what'   => 'login',
+				'action' => $theme_my_login->request_action,
+				'data'   => $theme_my_login->errors->get_error_code() ? $theme_my_login->errors : $data,
+				'supplemental' => array(
+					'html' => $data,
+					'success' => is_user_logged_in()
+				)
+			) );
+			$x->send();
+			exit;
 		}
 	}
 
@@ -84,11 +109,12 @@ class Theme_My_Login_Ajax {
 	 * Enqueues styles and scripts
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function wp_enqueue_scripts() {
 		wp_enqueue_style( 'theme-my-login-ajax', plugins_url( 'theme-my-login/modules/ajax/css/ajax.css' ) );
 
-		wp_enqueue_script( 'theme-my-login-ajax', plugins_url( 'theme-my-login/modules/ajax/js/ajax.js' ), array( 'jquery' ) );
+		wp_enqueue_script( 'theme-my-login-ajax', plugins_url( 'theme-my-login/modules/ajax/js/ajax.js' ), array( 'jquery', 'wp-ajax-response' ) );
 	}
 
 	/**
@@ -97,6 +123,7 @@ class Theme_My_Login_Ajax {
 	 * Callback for "tml_action_url" filter
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param string $url The action URL
 	 * @param string $action The action
@@ -115,6 +142,7 @@ class Theme_My_Login_Ajax {
 	 * Callback for "tml_redirect_url" filter
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param string $url The redirect URL
 	 * @param string $action The action
@@ -140,6 +168,7 @@ class Theme_My_Login_Ajax {
 	 * Adds CSS class to TML pages
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param array $classes CSS classes
 	 * @param object $page Post object
@@ -155,21 +184,21 @@ class Theme_My_Login_Ajax {
 	 * Adds CSS class to TML pages
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param object $menu_item Nav menu item
 	 * @return object Nav menu item
 	 */
 	public function wp_setup_nav_menu_item( $menu_item ) {
-		if ( ! is_user_logged_in() && Theme_My_Login::is_tml_page( '', $menu_item->object_id ) )
-			$menu_item->classes[] = 'tml_ajax_link';
+		if ( 'tml_page' == $menu_item->object && Theme_My_Login::is_tml_page( '', $menu_item->object_id ) ) {
+			if ( ! is_user_logged_in() )
+				$menu_item->classes[] = 'tml_ajax_link';
+		}
 		return $menu_item;
 	}
 }
 
-/**
- * Load the AJAX module
- *
- */
-Theme_My_Login::get_object()->load_module( 'ajax', 'Theme_My_Login_Ajax' );
+Theme_My_Login_Ajax::get_object();
 
-endif; // Class exists
+endif;
+

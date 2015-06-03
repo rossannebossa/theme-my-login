@@ -18,32 +18,46 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Holds options key
 	 *
 	 * @since 6.3
+	 * @access protected
 	 * @var string
 	 */
 	protected $options_key = 'theme_my_login_recaptcha';
 
 	/**
+	 * Returns singleton instance
+	 *
+	 * @since 6.3
+	 * @access public
+	 * @return object
+	 */
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
+
+	/**
 	 * Returns default options
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public static function default_options() {
 		return Theme_My_Login_Recaptcha::default_options();
 	}
 
 	/**
-	 * Constructor
+	 * Loads the module
 	 *
-	 * @since 6.4
+	 * Called by Theme_My_Login_Abstract::__construct()
+	 *
+	 * @see Theme_My_Login_Abstract::__construct()
+	 * @since 6.0
+	 * @access protected
 	 */
-	public function __construct() {
-		// Load options
-		$this->load_options();
+	protected function load() {
+		add_action( 'tml_uninstall_recaptcha/recaptcha.php', array( &$this, 'uninstall' ) );
 
-		add_action( 'tml_uninstall_recaptcha/recaptcha.php', array( $this, 'uninstall' ) );
-
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 	}
 
 	/**
@@ -53,6 +67,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login_Admin::uninstall()
 	 * @since 6.3
+	 * @access public
 	 */
 	public function uninstall() {
 		delete_option( $this->options_key );
@@ -64,6 +79,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "admin_menu" hook
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function admin_menu() {
 		global $theme_my_login;
@@ -79,9 +95,9 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 
 		add_settings_section( 'general', null, '__return_false', $this->options_key );
 
-		add_settings_field( 'public_key',  __( 'Public Key',  'theme-my-login' ), array( $this, 'settings_field_public_key'  ), $this->options_key, 'general' );
-		add_settings_field( 'private_key', __( 'Private Key', 'theme-my-login' ), array( $this, 'settings_field_private_key' ), $this->options_key, 'general' );
-		add_settings_field( 'theme',       __( 'Theme',       'theme-my-login' ), array( $this, 'settings_field_theme'       ), $this->options_key, 'general' );
+		add_settings_field( 'public_key',  __( 'Public Key',  'theme-my-login' ), array( &$this, 'settings_field_public_key'  ), $this->options_key, 'general' );
+		add_settings_field( 'private_key', __( 'Private Key', 'theme-my-login' ), array( &$this, 'settings_field_private_key' ), $this->options_key, 'general' );
+		add_settings_field( 'theme',       __( 'Theme',       'theme-my-login' ), array( &$this, 'settings_field_theme'       ), $this->options_key, 'general' );
 	}
 
 	/**
@@ -90,6 +106,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "admin_init" hook
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function admin_init() {
 		register_setting( $this->options_key, $this->options_key,  array( &$this, 'save_settings' ) );
@@ -99,6 +116,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Returns available reCAPTCHA themes
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function get_themes() {
 		$recaptcha_themes = array(
@@ -116,6 +134,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Callback for add_submenu_page()
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_page() {
 		Theme_My_Login_Admin::settings_page( array(
@@ -128,6 +147,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Renders the Public Key field.
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_public_key() {
 		?>
@@ -139,6 +159,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Renders the Private Key field.
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_private_key() {
 		?>
@@ -150,6 +171,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Renders the Theme field.
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_theme() {
 		?>
@@ -167,6 +189,7 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 	 * Callback for register_setting()
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param string|array $input Settings passed in from filter
 	 * @return string|array Sanitized settings
@@ -182,4 +205,8 @@ class Theme_My_Login_Recaptcha_Admin extends Theme_My_Login_Abstract {
 		return $output;
 	}
 }
-endif; // Class exists
+
+Theme_My_Login_Recaptcha_Admin::get_object();
+
+endif;
+

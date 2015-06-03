@@ -23,14 +23,27 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 * Holds options key
 	 *
 	 * @since 6.3
+	 * @access protected
 	 * @var string
 	 */
 	protected $options_key = 'theme_my_login_themed_profiles';
 
 	/**
+	 * Returns singleton instance
+	 *
+	 * @since 6.3
+	 * @access public
+	 * @return object
+	 */
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
+
+	/**
 	 * Returns default options
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @return array Default options
 	 */
@@ -53,29 +66,20 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	}
 
 	/**
-	 * Constructor
+	 * Loads the module
 	 *
-	 * @since 6.4
+	 * @since 6.0
+	 * @access protected
 	 */
-	public function __construct() {
-		// Load options
-		$this->load_options();
+	protected function load() {
+		add_action( 'tml_modules_loaded', array( &$this, 'modules_loaded' ) );
 
-		add_action( 'tml_modules_loaded', array( $this, 'modules_loaded' ) );
+		add_action( 'init',              array( &$this, 'init'              ) );
+		add_action( 'template_redirect', array( &$this, 'template_redirect' ) );
+		add_filter( 'show_admin_bar',    array( &$this, 'show_admin_bar'    ) );
 
-		add_action( 'init',              array( $this, 'init'              ) );
-		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
-		add_filter( 'show_admin_bar',    array( $this, 'show_admin_bar'    ) );
-
-		add_action( 'tml_request_profile', array( $this, 'tml_request_profile' ) );
-		add_action( 'tml_display_profile', array( $this, 'tml_display_profile' ) );
-
-		// Load admin
-		if ( is_admin() ) {
-			require_once( WP_PLUGIN_DIR . '/theme-my-login/modules/themed-profiles/admin/themed-profiles-admin.php' );
-
-			$this->admin = new Theme_My_Login_Themed_Profiles_Admin;
-		}
+		add_action( 'tml_request_profile', array( &$this, 'tml_request_profile' ) );
+		add_action( 'tml_display_profile', array( &$this, 'tml_display_profile' ) );
 	}
 
 	/**
@@ -87,8 +91,8 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 * @access public
 	 */
 	public function modules_loaded() {
-		add_filter( 'site_url',  array( $this, 'site_url' ), 10, 3 );
-		add_filter( 'admin_url', array( $this, 'site_url' ), 10, 2 );
+		add_filter( 'site_url',  array( &$this, 'site_url' ), 10, 3 );
+		add_filter( 'admin_url', array( &$this, 'site_url' ), 10, 2 );
 	}
 
 	/**
@@ -97,6 +101,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 * Callback for "init" hook
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function init() {
 		global $current_user, $pagenow;
@@ -132,6 +137,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 * Callback for "template_redirect" hook
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function template_redirect() {
 		$theme_my_login = Theme_My_Login::get_object();
@@ -170,6 +176,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 * Callback for "show_admin_bar" hook
 	 *
 	 * @since 6.2
+	 * @access public
 	 */
 	public function show_admin_bar( $show_admin_bar ) {
 		global $current_user;
@@ -191,12 +198,15 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login::the_request()
 	 * @since 6.0
+	 * @access public
 	 */
 	public function tml_request_profile() {
 		require_once( ABSPATH . 'wp-admin/includes/user.php' );
 		require_once( ABSPATH . 'wp-admin/includes/misc.php' );
 
 		define( 'IS_PROFILE_PAGE', true );
+
+		load_textdomain( 'default', WP_LANG_DIR . '/admin-' . get_locale() . '.mo' );
 
 		register_admin_color_schemes();
 
@@ -210,7 +220,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 			check_admin_referer( 'update-user_' . $current_user->ID );
 
 			if ( ! current_user_can( 'edit_user', $current_user->ID ) )
-				wp_die( __( 'You do not have permission to edit this user.' ) );
+				wp_die( __( 'You do not have permission to edit this user.', 'theme-my-login' ) );
 
 			do_action( 'personal_options_update', $current_user->ID );
 
@@ -236,6 +246,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login_Template::display()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param object $template Reference to $theme_my_login_template object
 	 */
@@ -246,7 +257,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 		require_once( ABSPATH . 'wp-admin/includes/misc.php' );
 
 		if ( isset( $_GET['updated'] ) && 'true' == $_GET['updated'] )
-			Theme_My_Login::get_object()->errors->add( 'profile_updated', __( 'Profile updated.' ), 'message' );
+			Theme_My_Login::get_object()->errors->add( 'profile_updated', __( 'Profile updated.', 'theme-my-login' ), 'message' );
 
 		$current_user = wp_get_current_user();
 		$profileuser  = get_user_to_edit( $current_user->ID );
@@ -282,6 +293,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	 *
 	 * @see site_url()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $url The generated link
 	 * @param string $path The specified path
@@ -298,7 +310,7 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 
 			if ( $user_role && ! $this->get_option( array( $user_role, 'theme_profile' ) ) )
 				return $url;
-					
+
 			$parsed_url = parse_url( $url );
 
 			$url = Theme_My_Login::get_page_link( 'profile' );
@@ -310,9 +322,10 @@ class Theme_My_Login_Themed_Profiles extends Theme_My_Login_Abstract {
 	}
 }
 
-/**
- * Load the Themed Profiles module
- */
-Theme_My_Login::get_object()->load_module( 'themed-profiles', 'Theme_My_Login_Themed_Profiles' );
+Theme_My_Login_Themed_Profiles::get_object();
 
-endif; // Class exists
+endif;
+
+if ( is_admin() )
+	include_once( dirname( 	__FILE__ ) . '/admin/themed-profiles-admin.php' );
+

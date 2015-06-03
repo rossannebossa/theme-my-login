@@ -18,14 +18,27 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Holds options key
 	 *
 	 * @ since 6.3
+	 * @access protected
 	 * @var string
 	 */
 	protected $options_key = 'theme_my_login_security';
 
 	/**
+	 * Returns singleton instance
+	 *
+	 * @since 6.3
+	 * @access public
+	 * @return object
+	 */
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
+
+	/**
 	 * Returns default options
 	 *
 	 * @since 6.3
+	 * @access public
 	 * @var array
 	 */
 	public static function default_options() {
@@ -33,21 +46,19 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	}
 
 	/**
-	 * Constructor
+	 * Loads the module
 	 *
-	 * @since 6.4
+	 * @since 6.0
+	 * @access protected
 	 */
-	public function __construct() {
-		// Load options
-		$this->load_options();
+	protected function load() {
+		add_action( 'tml_uninstall_security/security.php', array( &$this, 'uninstall' ) );
 
-		add_action( 'tml_uninstall_security/security.php', array( $this, 'uninstall' ) );
+		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
-
-		add_action( 'load-users.php',   array( $this, 'load_users_page'  )        );
-		add_filter( 'user_row_actions', array( $this, 'user_row_actions' ), 10, 2 );
+		add_action( 'load-users.php',   array( &$this, 'load_users_page'  )        );
+		add_filter( 'user_row_actions', array( &$this, 'user_row_actions' ), 10, 2 );
 	}
 
 	/**
@@ -57,6 +68,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login_Admin::uninstall()
 	 * @since 6.3
+	 * @access public
 	 */
 	public function uninstall() {
 		delete_option( $this->options_key );
@@ -69,6 +81,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "admin_menu" hook
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function admin_menu() {
 		add_submenu_page(
@@ -82,24 +95,26 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 
 		add_settings_section( 'general', null, '__return_false', $this->options_key );
 
-		add_settings_field( 'private_site',   __( 'Private Site',   'theme-my-login' ), array( $this, 'settings_field_private_site'   ), $this->options_key, 'general' );
-		add_settings_field( 'private_login',  __( 'Private Login',  'theme-my-login' ), array( $this, 'settings_field_private_login'  ), $this->options_key, 'general' );
-		add_settings_field( 'login_attempts', __( 'Login Attempts', 'theme-my-login' ), array( $this, 'settings_field_login_attempts' ), $this->options_key, 'general' );
+		add_settings_field( 'private_site',   __( 'Private Site',   'theme-my-login' ), array( &$this, 'settings_field_private_site'   ), $this->options_key, 'general' );
+		add_settings_field( 'private_login',  __( 'Private Login',  'theme-my-login' ), array( &$this, 'settings_field_private_login'  ), $this->options_key, 'general' );
+		add_settings_field( 'login_attempts', __( 'Login Attempts', 'theme-my-login' ), array( &$this, 'settings_field_login_attempts' ), $this->options_key, 'general' );
 	}
 
 	/**
 	 * Registers options group
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function admin_init() {
-		register_setting( $this->options_key, $this->options_key, array( $this, 'save_settings' ) );
+		register_setting( $this->options_key, $this->options_key, array( &$this, 'save_settings' ) );
 	}
 
 	/**
 	 * Renders settings page
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_page() {
 		Theme_My_Login_Admin::settings_page( array(
@@ -112,6 +127,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Renders Private Site settings field
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_private_site() {
 		?>
@@ -124,6 +140,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Renders Private Login settings field
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_private_login() {
 		?>
@@ -136,6 +153,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Renders Login Attempts settings field
 	 *
 	 * @since 6.3
+	 * @access public
 	 */
 	public function settings_field_login_attempts() {
 		// Units
@@ -179,6 +197,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login_Admin::save_settings()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string|array $settings Settings passed in from filter
 	 * @return string|array Sanitized settings
@@ -203,6 +222,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "load-users.php" hook
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function load_users_page() {
 
@@ -218,10 +238,10 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 			$user = isset( $_GET['user'] ) ? $_GET['user'] : '';
 
 			if ( ! $user || ! current_user_can( 'edit_user', $user ) )
-				wp_die( __( 'You can&#8217;t edit that user.' ) );
+				wp_die( __( 'You can&#8217;t edit that user.', 'theme-my-login' ) );
 
 			if ( ! $user = get_userdata( $user ) )
-				wp_die( __( 'You can&#8217;t edit that user.' ) );
+				wp_die( __( 'You can&#8217;t edit that user.', 'theme-my-login' ) );
 
 			if ( 'lock' == $_GET['action'] ) {
 				check_admin_referer( 'lock-user_' . $user->ID );
@@ -248,6 +268,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "admin_notices" hook in file admin-header.php
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function admin_notices() {
 		if ( isset( $_GET['update'] ) ) {
@@ -264,6 +285,7 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 	 * Callback for "user_row_actions" hook in {@internal unknown}
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param array $actions The user actions
 	 * @param WP_User $user_object The current user object
@@ -284,4 +306,8 @@ class Theme_My_Login_Security_Admin extends Theme_My_Login_Abstract {
 		return $actions;
 	}
 }
-endif; // Class exists
+
+Theme_My_Login_Security_Admin::get_object();
+
+endif;
+

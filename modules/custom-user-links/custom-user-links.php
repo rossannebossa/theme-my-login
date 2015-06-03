@@ -23,14 +23,27 @@ class Theme_My_Login_Custom_User_Links extends Theme_My_Login_Abstract {
 	 * Holds options key
 	 *
 	 * @since 6.3
+	 * @access protected
 	 * @var string
 	 */
 	protected $options_key = 'theme_my_login_user_links';
 
 	/**
+	 * Returns singleton instance
+	 *
+	 * @since 6.3
+	 * @access public
+	 * @return object
+	 */
+	public static function get_object( $class = null ) {
+		return parent::get_object( __CLASS__ );
+	}
+
+	/**
 	 * Returns default options
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @return array Default options
 	 */
@@ -45,11 +58,11 @@ class Theme_My_Login_Custom_User_Links extends Theme_My_Login_Abstract {
 			if ( 'pending' != $role ) {
 				$options[$role] = array(
 					array(
-						'title' => __( 'Dashboard' ),
+						'title' => __( 'Dashboard', 'theme-my-login' ),
 						'url'   => admin_url()
 					),
 					array(
-						'title' => __( 'Profile' ),
+						'title' => __( 'Profile', 'theme-my-login' ),
 						'url'   => admin_url( 'profile.php' )
 					)
 				);
@@ -59,22 +72,13 @@ class Theme_My_Login_Custom_User_Links extends Theme_My_Login_Abstract {
 	}
 
 	/**
-	 * Constructor
+	 * Loads the module
 	 *
 	 * @since 6.0
+	 * @access protected
 	 */
-	public function __construct() {
-		// Load options
-		$this->load_options();
-
-		add_filter( 'tml_user_links', array( $this, 'get_user_links' ) );
-
-		// Load admin
-		if ( is_admin() ) {
-			require_once( WP_PLUGIN_DIR . '/theme-my-login/modules/custom-user-links/admin/custom-user-links-admin.php' );
-
-			$this->admin = new Theme_My_Login_Custom_User_Links_Admin;
-		}
+	protected function load() {
+		add_filter( 'tml_user_links', array( &$this, 'get_user_links' ) );
 	}
 
 	/**
@@ -84,6 +88,7 @@ class Theme_My_Login_Custom_User_Links extends Theme_My_Login_Abstract {
 	 *
 	 * @see Theme_My_Login_Template::display()
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param array $links Default user links
 	 * @return array New user links
@@ -116,9 +121,10 @@ class Theme_My_Login_Custom_User_Links extends Theme_My_Login_Abstract {
 	}
 }
 
-/**
- * Load the Custom User Links module
- */
-Theme_My_Login::get_object()->load_module( 'custom-user-links', 'Theme_My_Login_Custom_User_Links' );
+Theme_My_Login_Custom_User_Links::get_object();
 
-endif; // Class exists
+endif;
+
+if ( is_admin() )
+	include_once( dirname( __FILE__ ) . '/admin/custom-user-links-admin.php' );
+

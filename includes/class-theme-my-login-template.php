@@ -19,6 +19,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Holds active instance flag
 	 *
 	 * @since 6.3
+	 * @access private
 	 * @var bool
 	 */
 	private $is_active = false;
@@ -27,6 +28,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Constructor
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param array $options Instance options
 	 */
@@ -41,6 +43,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Retrieves default options
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @return array Default options
 	 */
@@ -72,6 +75,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Displays output according to current action
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @return string HTML output
 	 */
@@ -130,6 +134,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns action title
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action The action to retrieve. Defaults to current action.
 	 * @return string Title of $action
@@ -137,6 +142,9 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	public function get_title( $action = '' ) {
 		if ( empty( $action ) )
 			$action = $this->get_option( 'default_action' );
+
+		if ( is_admin() )
+			return;
 
 		if ( is_user_logged_in() && 'login' == $action && $action == $this->get_option( 'default_action' ) ) {
 			$title = sprintf( __( 'Welcome, %s', 'theme-my-login' ), wp_get_current_user()->display_name );
@@ -146,17 +154,17 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 			} else {
 				switch ( $action ) {
 					case 'register':
-						$title = __( 'Register' );
+						$title = __( 'Register', 'theme-my-login' );
 						break;
 					case 'lostpassword':
 					case 'retrievepassword':
 					case 'resetpass':
 					case 'rp':
-						$title = __( 'Lost Password' );
+						$title = __( 'Lost Password', 'theme-my-login' );
 						break;
 					case 'login':
 					default:
-						$title = __( 'Log In' );
+						$title = __( 'Log In', 'theme-my-login' );
 				}
 			}
 		}
@@ -167,6 +175,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs action title
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action The action to retieve. Defaults to current action.
 	 */
@@ -178,13 +187,14 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns plugin errors
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function get_errors() {
 		global $error;
 
 		$theme_my_login = Theme_My_Login::get_object();
 
-		$wp_error =& $theme_my_login->errors;
+		$wp_error = $theme_my_login->errors;
 
 		if ( empty( $wp_error ) )
 			$wp_error = new WP_Error();
@@ -222,6 +232,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Prints plugin errors
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function the_errors() {
 		echo $this->get_errors();
@@ -231,6 +242,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns requested action URL
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action Action to retrieve
 	 * @return string The requested action URL
@@ -259,6 +271,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs requested action URL
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action Action to retrieve
 	 */
@@ -270,6 +283,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns the action links
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param array $args Optionally specify which actions to include/exclude. By default, all are included.
 	 */
@@ -279,7 +293,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 			'register'     => true,
 			'lostpassword' => true
 		) );
-		
+
 		$action_links = array();
 		if ( $args['login'] && $this->get_option( 'show_log_link' ) ) {
 			$action_links[] = array(
@@ -306,6 +320,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs the action links
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param array $args Optionally specify which actions to include/exclude. By default, all are included.
 	 */
@@ -323,16 +338,17 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns logged-in user links
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @return array Logged-in user links
 	 */
 	public static function get_user_links() {
 		$user_links = array(
 			array(
-				'title' => __( 'Dashboard' ),
+				'title' => __( 'Dashboard', 'theme-my-login' ),
 				'url'   => admin_url() ),
 			array(
-				'title' => __( 'Profile' ),
+				'title' => __( 'Profile', 'theme-my-login' ),
 				'url'   => admin_url( 'profile.php' )
 			)
 		);
@@ -343,6 +359,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs logged-in user links
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function the_user_links() {
 		echo '<ul class="tml-user-links">';
@@ -357,6 +374,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Displays user avatar
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function the_user_avatar( $size = '' ) {
 		if ( empty( $size ) )
@@ -371,6 +389,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns template message for requested action
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action Action to retrieve
 	 * @return string The requested template message
@@ -378,13 +397,13 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	public static function get_action_template_message( $action = '' ) {
 		switch ( $action ) {
 			case 'register':
-				$message = __( 'Register For This Site' );
+				$message = __( 'Register For This Site', 'theme-my-login' );
 				break;
 			case 'lostpassword':
-				$message = __( 'Please enter your username or email address. You will receive a link to create a new password via email.' );
+				$message = __( 'Please enter your username or email address. You will receive a link to create a new password via email.', 'theme-my-login' );
 				break;
 			case 'resetpass':
-				$message = __( 'Enter your new password below.' );
+				$message = __( 'Enter your new password below.', 'theme-my-login' );
 				break;
 			default:
 				$message = '';
@@ -398,6 +417,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs template message for requested action
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action Action to retrieve
 	 * @param string $before_message Text/HTML to add before the message
@@ -412,6 +432,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Locates specified template
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string|array $template_names The template(s) to locate
 	 * @param bool $load If true, the template will be included if found
@@ -423,38 +444,50 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 		$theme_my_login = Theme_My_Login::get_object();
 
 		// User friendly access to this
-		$template =& $this;
+		$template = $this;
 
 		// Easy access to current user
 		$current_user = wp_get_current_user();
 
 		extract( apply_filters_ref_array( 'tml_template_args', array( $args, &$this ) ) );
 
-		if ( ! is_array( $template_names ) )
-			$template_names = array( $template_names );
+		$template_paths = apply_filters( 'tml_template_paths', array(
+			get_stylesheet_directory() . '/theme-my-login',
+			get_stylesheet_directory(),
+			get_template_directory() . '/theme-my-login',
+			get_template_directory(),
+			WP_PLUGIN_DIR . '/theme-my-login/templates'
+		) );
 
-		if ( ! $found_template = locate_template( $template_names ) ) {
-			foreach ( $template_names as $template_name ) {
-				if ( file_exists( WP_PLUGIN_DIR . '/theme-my-login/templates/' . $template_name ) ) {
-					$found_template = WP_PLUGIN_DIR . '/theme-my-login/templates/' . $template_name;
-					break;
+		foreach ( (array) $template_names as $template_name ) {
+
+			if ( ! $template_name )
+				continue;
+
+			if ( preg_match( '/\/|\\\\/', $template_name ) )
+				continue;
+
+			foreach ( $template_paths as $template_path ) {
+				if ( file_exists( $template_path . '/' . $template_name ) ) {
+					$located = $template_path . '/' . $template_name;
+					break 2;
 				}
 			}
 		}
 
-		$found_template = apply_filters_ref_array( 'tml_template', array( $found_template, $template_names, &$this ) );
+		$located = apply_filters_ref_array( 'tml_template', array( $located, $template_names, &$this ) );
 
-		if ( $load && $found_template ) {
-			include( $found_template );
-		}
+		if ( $load && '' != $located )
+			include( $located );
 
-		return $found_template;
+		return $located;
 	}
 
 	/**
 	 * Returns the proper redirect URL according to action
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action The action
 	 * @return string The redirect URL
@@ -487,6 +520,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs redirect URL
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $action The action
 	 */
@@ -498,6 +532,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs current template instance ID
 	 *
 	 * @since 6.0
+	 * @access public
 	 */
 	public function the_instance() {
 		if ( $this->get_option( 'instance' ) )
@@ -508,6 +543,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns requested $value
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $value The value to retrieve
 	 * @return string|bool The value if it exists, false if not
@@ -522,6 +558,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Outputs requested value
 	 *
 	 * @since 6.0
+	 * @access public
 	 *
 	 * @param string $value The value to retrieve
 	 */
@@ -533,6 +570,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Returns active status
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @return bool True if instance is active, false if not
 	 */
@@ -544,6 +582,7 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	 * Sets active status
 	 *
 	 * @since 6.3
+	 * @access public
 	 *
 	 * @param bool $active Active status
 	 */
@@ -552,3 +591,4 @@ class Theme_My_Login_Template extends Theme_My_Login_Abstract {
 	}
 }
 endif; // Class exists
+
