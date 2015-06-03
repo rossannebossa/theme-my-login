@@ -136,6 +136,7 @@ class Theme_My_Login extends Theme_My_Login_Abstract {
 		add_action( 'init',                    array( &$this, 'init'                    ) );
 		add_action( 'widgets_init',            array( &$this, 'widgets_init'            ) );
 		add_action( 'wp',                      array( &$this, 'wp'                      ) );
+		add_action( 'pre_get_posts',           array( &$this, 'pre_get_posts'           ) );
 		add_action( 'template_redirect',       array( &$this, 'template_redirect'       ) );
 		add_action( 'wp_enqueue_scripts',      array( &$this, 'wp_enqueue_scripts'      ) );
 		add_action( 'wp_head',                 array( &$this, 'wp_head'                 ) );
@@ -234,6 +235,39 @@ class Theme_My_Login extends Theme_My_Login_Abstract {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Exclude TML pages from search
+	 *
+	 * @since 6.1.13
+	 * @access public
+	 */
+	public function pre_get_posts( &$query ) {
+
+		// Bail if not a search
+		if ( ! $query->is_search )
+			return;
+
+		// Get TML pages
+		$pages = get_posts( array(
+			'post_type'      => 'page',
+			'post_status'    => 'any',
+			'meta_key'       => '_tml_action',
+			'posts_per_page' => -1
+		) );
+
+		// Get the page IDs
+		$pages = wp_list_pluck( $pages, 'ID' );
+
+		// Get any currently exclude posts
+		$excludes = (array) $query->get( 'post__not_in' );
+
+		// Merge the excludes
+		$excludes = array_merge( $excludes, $pages );
+
+		// Set the excludes
+		$query->set( 'post__not_in', $excludes );
 	}
 
 	/**
