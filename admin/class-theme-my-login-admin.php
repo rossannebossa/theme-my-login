@@ -23,6 +23,15 @@ class Theme_My_Login_Admin extends Theme_My_Login_Abstract {
 	protected $options_key = 'theme_my_login';
 
 	/**
+	 * Holds settings tabs
+	 *
+	 * @since 6.4
+	 * @access private
+	 * @var array
+	 */
+	private $settings_tabs = array();
+
+	/**
 	 * Returns singleton instance
 	 *
 	 * @since 6.3
@@ -69,7 +78,7 @@ class Theme_My_Login_Admin extends Theme_My_Login_Abstract {
 			__( 'TML', 'theme-my-login' ),
 			'manage_options',
 			'theme_my_login',
-			array( 'Theme_My_Login_Admin', 'settings_page' )
+			array( $this, 'settings_page' )
 		);
 
 		add_submenu_page(
@@ -78,7 +87,7 @@ class Theme_My_Login_Admin extends Theme_My_Login_Abstract {
 			__( 'General', 'theme-my-login' ),
 			'manage_options',
 			'theme_my_login',
-			array( 'Theme_My_Login_Admin', 'settings_page' )
+			array( $this, 'settings_page' )
 		);
 
 		// General section
@@ -104,6 +113,11 @@ class Theme_My_Login_Admin extends Theme_My_Login_Abstract {
 
 		if ( version_compare( $this->get_option( 'version', 0 ), Theme_My_Login::version, '<' ) )
 			$this->install();
+
+		$this->add_settings_tab( 'general', array(
+			'title'       => __( 'General', 'theme-my-login' ),
+			'options_key' => 'theme_my_login'
+		) );
 	}
 
 	/**
@@ -120,30 +134,131 @@ class Theme_My_Login_Admin extends Theme_My_Login_Abstract {
 	}
 
 	/**
+	 * Add a settings tab
+	 *
+	 * @since 6.4
+	 * @access public
+	 *
+	 * @param string $name Tab name
+	 * @param array $args Tab arguments
+	 * @return object Tab object
+	 */
+	public function add_settings_tab( $name, $args = array() ) {
+
+		$defaults = array(
+			'title'       => '',
+			'options_key' => ''
+		);
+		$args = wp_parse_args( $args, $defaults );
+		$args = (object) $args;
+
+		$name = sanitize_key( $name );
+		$args->name = $name;
+
+		if ( empty( $args->title ) )
+			$args->title = $name;
+
+		$this->settings_tabs[ $name ] = $args;
+
+		return $args;
+	}
+
+	/**
+	 * Get a settings tab
+	 *
+	 * @since 6.4
+	 * @access public
+	 *
+	 * @param string $name Tab name
+	 * @return object Tab object
+	 */
+	public function get_settings_tab( $name ) {
+
+		if ( empty( $this->settings_tabs[ $name ] ) )
+			return null;
+
+		return $this->settings_tabs[ $name ];
+	}
+
+	/**
+	 * Get the current settings tab
+	 *
+	 * @since 6.4
+	 * @access public
+	 */
+	public function get_current_settings_tab() {
+
+		// Get the passed tab
+		$tab = ! empty( $_GET['tab'] ) ? $_REQUEST['tab'] : 'general';
+
+		// Get the tab object
+		$tab = $this->get_settings_tab( $tab );
+
+		// Fallback to General tab if no tab passed
+		if ( empty( $tab ) )
+			$tab = $this->get_settings_tab( 'general' );
+
+		return $tab;
+	}
+
+	/**
+	 * Display settings tabs
+	 *
+	 * @since 6.4
+	 * @access public
+	 */
+	public function settings_tabs() {
+
+		// Bail if no tabs
+		if ( empty( $this->settings_tabs ) )
+			return;
+
+		// Get the current tab
+		$current_tab = $this->get_current_settings_tab(); ?>
+
+		<h2 class="nav-tab-wrapper">
+
+		<?php foreach ( $this->settings_tabs as $tab ) : ?>
+
+			<a class="nav-tab<?php if ( $current_tab->name == $tab->name ) echo ' nav-tab-active'; ?>" href="<?php echo add_query_arg( array( 'page' => 'theme_my_login', 'tab' => $tab->name ), 'admin.php' ); ?>"><?php echo $tab->title; ?></a>
+
+		<?php endforeach; ?>
+
+		</h2>
+
+		<?php
+	}
+
+	/**
 	 * Renders the settings page
 	 *
 	 * @since 6.0
 	 * @access public
 	 */
-	public static function settings_page( $args = '' ) {
-		extract( wp_parse_args( $args, array(
-			'title'       => __( 'Theme My Login Settings', 'theme-my-login' ),
-			'options_key' => 'theme_my_login'
-		) ) );
-		?>
-		<div id="<?php echo $options_key; ?>" class="wrap">
-			<?php screen_icon( 'options-general' ); ?>
-			<h2><?php echo esc_html( $title ); ?></h2>
+	public function settings_page() {
+
+		// Get the current tab
+		$current_tab = $this->get_current_settings_tab(); ?>
+
+		<div id="<?php echo $current_tab->options_key; ?>" class="wrap">
+
+			<h2><?php esc_html_e( 'Theme My Login Settings', 'theme-my-login' ); ?></h2>
+
 			<?php settings_errors(); ?>
 
+			<?php $this->settings_tabs(); ?>
+
 			<form method="post" action="options.php">
-				<?php
-					settings_fields( $options_key );
-					do_settings_sections( $options_key );
-					submit_button();
-				?>
+
+				<?php settings_fields( $current_tab->options_key ); ?>
+
+				<?php do_settings_sections( $current_tab->options_key ); ?>
+
+				<?php submit_button(); ?>
+
 			</form>
 		</div>
+
 		<?php
 	}
 
