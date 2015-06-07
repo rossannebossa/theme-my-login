@@ -99,7 +99,7 @@ class Theme_My_Login extends Theme_My_Login_Abstract {
 	public static function default_options() {
 		return apply_filters( 'tml_default_options', array(
 			'enable_css'     => true,
-			'email_login'    => true,
+			'login_type'     => 'default',
 			'active_modules' => array()
 		) );
 	}
@@ -400,7 +400,11 @@ class Theme_My_Login extends Theme_My_Login_Abstract {
 					$user_login = '';
 					$user_email = '';
 					if ( $http_post ) {
-						$user_login = $_POST['user_login'];
+						if ( 'email' == $this->get_option( 'login_type' ) ) {
+							$user_login = $_POST['user_email'];
+						} else {
+							$user_login = $_POST['user_login'];
+						}
 						$user_email = $_POST['user_email'];
 
 						$this->errors = self::register_new_user( $user_login, $user_email );
@@ -600,7 +604,7 @@ if(typeof wpOnload=='function')wpOnload()
 	}
 
 	/**
-	 * Handles e-mail address login
+	 * Handles login type enforcement
 	 *
 	 * @since 6.0
 	 * @access public
@@ -610,11 +614,18 @@ if(typeof wpOnload=='function')wpOnload()
 	 */
 	public function wp_authenticate( &$user_login ) {
 		global $wpdb;
-		if ( is_email( $user_login ) && $this->get_option( 'email_login' ) ) {
+
+		$login_type = $this->get_option( 'login_type' );
+
+		if ( 'default' == $login_type )
+			return;
+
+		if ( ! is_email( $user_login ) && 'email' == $login_type ) {
+			$user_login = -1;
+		} elseif ( is_email( $user_login ) ) {
 			if ( $found = $wpdb->get_var( $wpdb->prepare( "SELECT user_login FROM $wpdb->users WHERE user_email = %s", $user_login ) ) )
 				$user_login = $found;
 		}
-		return;
 	}
 
 
